@@ -1,0 +1,46 @@
+---
+- name: Building and running RStudio container
+  hosts: localhost
+  vars_prompt:
+  - name: R_version
+    prompt: "Enter the R version you require"
+    private: no  
+  - name: R_tools
+    prompt: 'Enter the R package tool you require as a space-separated list if more than one, e.g. tool1 tool2 tool3. If irrelevant, just press enter'
+    private: no
+  - name: BiocManager_tools
+    prompt: 'Enter the BiocManager tool you require, in the format (c(\"tool\")), as a comma-separated list if more than one, e.g. (c(\"tool1\",\"tool2\",\"tool3\")). If irrelevant, just press enter'
+    private: no
+  - name: container_name
+    prompt: "Give the container a name"
+    private: no
+  - name: container_version
+    prompt: "Give the container a version number"
+    private: no
+  - name: rstudio_password
+    prompt: "Give a simple password for your RStudio session, e.g. abc"
+    private: no
+  - name: pubkey_path
+    prompt: "Enter the path to your ssh private key for this Nimbus instance on your local computer"
+    private: no
+  tasks:
+  - name: Writing the Dockerfile
+    shell: |
+      #cd /home/ubuntu/RStudio
+      sed -i "s|rstudio:4.0.3|rstudio:{{ R_version }}|g" Dockerfile
+      sed -i "s|caTools|caTools {{ R_tools }}|g" Dockerfile
+      echo "RUN R -e 'library(BiocManager)'
+      RUN R -e 'BiocManager::install({{ BiocManager_tools }})'" >> Dockerfile
+  - name: Building the container
+    command: sudo docker build -t {{ container_name }}:{{ container_version }} .
+  - name: Pulling the container as a Singularity image
+    command: sudo singularity pull docker-daemon:{{ container_name }}:{{ container_version }}
+  - name: Running the container as an interactive RStudio session
+    script: run_rstudio.sh '{{ pubkey_path }}' '{{ rstudio_password}}'
+    register: result_rstudio
+  - name: Run rserver command
+    shell: |
+      PASSWORD='{{ rstudio_password }}' singularity exec -B /tmp/rstudio-server:/var/lib/rstudio-server -B /tmp/rstudio-server:/var/run/rstudio-server -B /data:/home {{ container_name }}_{{ container_version }}.sif rserver --www-port 8787 --www-address 0.0.0.0 --auth-none=0 --auth-pam-helper-path=pam-helper &
+  - name: Print RStudio server instructions
+    debug: 
+      var: result_rstudio.stdout_lines    

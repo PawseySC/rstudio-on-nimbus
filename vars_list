@@ -1,0 +1,10 @@
+all:
+  hosts: local
+  vars:
+    R_version:
+    R_tools:
+    BiocManager_tools: 
+    container_name:
+    container_version:
+    rstudio_password:
+    pubkey_path:
