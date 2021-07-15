@@ -26,13 +26,13 @@
   tasks:
   - name: Writing the Dockerfile
     shell: |
-      #cd /home/ubuntu/RStudio
-      sed -i "s|rstudio:4.0.3|rstudio:{{ R_version }}|g" Dockerfile
-      sed -i "s|caTools|caTools {{ R_tools }}|g" Dockerfile
+      cp Dockerfile Dockerfile-{{ container_name }}
+      sed -i "s|rstudio:4.0.3|rstudio:{{ R_version }}|g" Dockerfile-{{ container_name }}
+      sed -i "s|caTools|caTools {{ R_tools }}|g" Dockerfile-{{ container_name }}
       echo "RUN R -e 'library(BiocManager)'
-      RUN R -e 'BiocManager::install({{ BiocManager_tools }})'" >> Dockerfile
+      RUN R -e 'BiocManager::install({{ BiocManager_tools }})'" >> Dockerfile-{{ container_name }}
   - name: Building the container
-    command: sudo docker build -t {{ container_name }}:{{ container_version }} .
+    command: sudo docker build -f Dockerfile-{{ container_name }} -t {{ container_name }}:{{ container_version }} .
   - name: Pulling the container as a Singularity image
     command: sudo singularity pull docker-daemon:{{ container_name }}:{{ container_version }}
   - name: Running the container as an interactive RStudio session
