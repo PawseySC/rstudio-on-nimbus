@@ -3,9 +3,20 @@
 ## Summary
 This repository covers the scripts for running RStudio with Ansible on cloud services. The RStudio Dockerfile is written based off Rocker/Tidyverse - which is handy for bioinformatics users, with changes made to the read permissions of RStudio server paths to enable running of RStudio interactively. The container is first built with Docker, then pulled as a Singularity image. This allows the image to be used on HPC if required. 
 
-## How to
+## Quick start
 When the Ansible script is run, the user will be prompted to enter any R packages or Bioconductor packages that is required. While libraries can be installed post-container build, it is encouraged to build them into the container for software dependency efficiencies.
 
     git clone https://github.com/audreystott/ansible-rstudio.git
     cd ansible-rstudio
     ansible-playbook ansible-rstudio.yaml -i vars_list
+
+## Notes
+It is recommended that users change their Singularity cache directory to a volume storage, as the default is in the `/home` directory, i.e. `/home/ubuntu/.singularity/cache`. To change it, simply create a new directory and update the `$SINGULARITY_CACHEDIR` variable to it. For e.g. if the volume storage is mounted to `/data`:
+
+    mkdir /data/singularity_cache
+    SINGULARITY_CACHEDIR=/data/singularity_cache
+
+It is also good to clean the cache from time to time - when image pulls are completed. To clean it, first list and check that you are happy to remove the cache:
+
+    sudo singularity cache list
+    sudo singularity cache clean
