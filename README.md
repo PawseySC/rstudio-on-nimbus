@@ -18,5 +18,9 @@ It is recommended that users change their Singularity cache directory to a volum
 
 It is also good to clean the cache from time to time - when image pulls are completed. To clean it, first list and check that you are happy to remove the cache:
 
+    singularity cache list
+    singularity cache clean
+
+    ** Use sudo if you did not change the $SINGULARITY_CACHEDIR variable **
     sudo singularity cache list
     sudo singularity cache clean
