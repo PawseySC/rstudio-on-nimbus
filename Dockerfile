@@ -22,13 +22,7 @@ RUN apt-get update -qq && apt-get -y --no-install-recommends install \
 
 RUN R -e 'install.packages("BiocManager")'
 
-# RUN mkdir /home/rstudio/library \
-#     && chown rstudio:rstudio /home/rstudio/library \
-#     && echo ".libPaths(c('/home/rstudio/library'))" >> /usr/local/lib/R/library/base/R/Rprofile \
-
 RUN     chmod a+w /var/lib/rstudio-server \
         && chmod a+w /var/lib/rstudio-server/rstudio.sqlite \
         && chmod a+w /var/lib/rstudio-server/secure-cookie-key     
 
-RUN R -e 'library(BiocManager)'
-RUN R -e 'BiocManager::install()'
