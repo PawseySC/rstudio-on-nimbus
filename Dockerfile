@@ -22,7 +22,7 @@ RUN apt-get update -qq && apt-get -y --no-install-recommends install \
 
 RUN R -e 'install.packages("BiocManager")'
 
-RUN  chmod a+w /var/lib/rstudio-server \
-     && chmod a+w /var/lib/rstudio-server/rstudio.sqlite \
-     && chmod a+w /var/lib/rstudio-server/secure-cookie-key     
+RUN chmod a+w /var/lib/rstudio-server \
+    && chmod a+w /var/lib/rstudio-server/rstudio.sqlite \
+    && chmod a+w /var/lib/rstudio-server/secure-cookie-key     
 
