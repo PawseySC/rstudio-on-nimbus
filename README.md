@@ -6,6 +6,14 @@ This repository covers the scripts for running RStudio with Ansible on cloud ser
 ## Quick start
 When the Ansible script is run, the user will be prompted to enter any R packages or Bioconductor packages that is required. While libraries can be installed post-container build, it is encouraged to build them into the container for software dependency efficiencies.
 
+### Install Ansible (if it is not already installed)
+
+    sudo apt install software-properties-common
+    sudo add-apt-repository --yes --update ppa:ansible/ansible
+    sudo apt install ansible
+    
+### Clone this repo and run the Ansible script
+
     git clone https://github.com/audreystott/ansible-rstudio.git
     cd ansible-rstudio
     ansible-playbook ansible-rstudio.yaml -i vars_list
