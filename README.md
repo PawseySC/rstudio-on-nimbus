@@ -1,10 +1,12 @@
 # Automated deployment of RStudio
 
 ## Summary
-This repository covers the scripts for running RStudio with Ansible on cloud services. The RStudio Dockerfile is written based off Rocker/Tidyverse - which is handy for bioinformatics users, with changes made to the read permissions of RStudio server paths to enable running of RStudio interactively. The container is first built with Docker, then pulled as a Singularity image. This allows the image to be used on HPC if required. 
+This repository covers the scripts for running RStudio with Ansible on cloud services. The RStudio Dockerfile is based off Rocker/Tidyverse - which is handy for bioinformatics users, with changes made to the read permissions of RStudio server paths to enable running of RStudio interactively. The container is first built with Docker, then pulled as a Singularity image. This allows the image to be used on HPC if required. 
 
 ## Quick start
 This is an interactive deployment, such that when the Ansible playbook script is run, the user will be prompted to enter any R packages or Bioconductor packages that is required. While libraries can be installed post-container build, it is encouraged to build them into the container for software dependency efficiencies.
+
+**Note that the time taken for this deployment varies, and if run for the first time, will require at least 5-10 minutes for the RStudio container to be built.**
 
 ### Prerequisite
 This Ansible playbook works on Ubuntu 18.04 and Ubuntu 20.04. Other operating systems and versions will require testing. Raise a ticket if you face issues running this with other operating systems.

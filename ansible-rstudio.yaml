@@ -3,7 +3,7 @@
   hosts: localhost
   vars_prompt:
   - name: R_version
-    prompt: "Enter the R version you require - ensure it is available as a tag at https://hub.docker.com/r/rocker/rstudio/tags."
+    prompt: "Enter the R version you require - ensure it is available as a tag at https://hub.docker.com/r/rocker/tidyverse/tags?page=1&ordering=last_updated."
     private: no  
   - name: R_tools
     prompt: "Enter the R package tool you require as a space-separated list if more than one, e.g. tool1 tool2 tool3. If irrelevant, just press enter"
@@ -21,13 +21,13 @@
     prompt: "Give a simple password for your RStudio session, e.g. abc"
     private: no
   - name: pubkey_path
-    prompt: "Enter the path to your ssh private key for this Nimbus instance on your local computer"
+    prompt: "Enter the path to your ssh private key for this Nimbus instance on your local computer, e.g. ~/.ssh/id_rsa.key"
     private: no
   tasks:
   - name: Writing the Dockerfile
     shell: |
       cp Dockerfile Dockerfile-{{ container_name }}
-      sed -i "s|rstudio:4.0.3|rstudio:{{ R_version }}|g" Dockerfile-{{ container_name }}
+      sed -i "s|tidyverse:4.0.3|tidyverse:{{ R_version }}|g" Dockerfile-{{ container_name }}
       sed -i "s|caTools|caTools {{ R_tools }}|g" Dockerfile-{{ container_name }}
       echo "RUN R -e 'library(BiocManager)'
       RUN R -e 'BiocManager::install({{ BiocManager_tools }})'" >> Dockerfile-{{ container_name }}
