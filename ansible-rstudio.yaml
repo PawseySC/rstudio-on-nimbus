@@ -3,7 +3,7 @@
   hosts: localhost
   vars_prompt:
   - name: R_version
-    prompt: "Enter the R version you require - ensure it is available as a tag at https://hub.docker.com/r/rocker/tidyverse/tags?page=1&ordering=last_updated."
+    prompt: "Enter the R version you require - ensure it is available as a tag at https://hub.docker.com/r/rocker/tidyverse/tags"
     private: no  
   - name: R_tools
     prompt: "Enter the R package tool you require as a space-separated list if more than one, e.g. tool1 tool2 tool3. If irrelevant, just press enter"
