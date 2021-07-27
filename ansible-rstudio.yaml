@@ -12,7 +12,7 @@
     prompt: 'Enter the BiocManager tool you require, in the format (c(\"tool\")), as a comma-separated list if more than one, e.g. (c(\"tool1\",\"tool2\",\"tool3\")). If irrelevant, just press enter'
     private: no
   - name: container_name
-    prompt: "Give the container a name"
+    prompt: "Give the container a name (no capitals)"
     private: no
   - name: container_version
     prompt: "Give the container a version number"
@@ -20,7 +20,7 @@
   - name: rstudio_password
     prompt: "Give a simple password for your RStudio session, e.g. abc"
     private: no
-  - name: pubkey_path
+  - name: ssh_key_path
     prompt: "Enter the path to your ssh private key for this Nimbus instance on your local computer, e.g. ~/.ssh/id_rsa.key"
     private: no
   tasks:
@@ -35,12 +35,21 @@
     command: sudo docker build -f Dockerfile-{{ container_name }} -t {{ container_name }}:{{ container_version }} .
   - name: Pulling the container as a Singularity image
     command: sudo singularity pull docker-daemon:{{ container_name }}:{{ container_version }}
+    args:
+      creates: "{{ container_name }}_{{ container_version }}.sif"
   - name: Running the container as an interactive RStudio session
-    script: run_rstudio.sh '{{ pubkey_path }}' '{{ rstudio_password}}'
+    script: run_rstudio.sh '{{ ssh_key_path }}' '{{ rstudio_password}}'
     register: result_rstudio
+  - name: Create a data folder
+    command: sudo mkdir /data && sudo chown ubuntu:ubuntu /data
+    args:
+      creates: /data
+  - name: Create RStudio server folder
+    command: mkdir -p /tmp/rstudio-server
+    args:  
+      creates: /tmp/rstudio-server
   - name: Run rserver command
-    shell: |
-      PASSWORD='{{ rstudio_password }}' singularity exec -B /tmp/rstudio-server:/var/lib/rstudio-server -B /tmp/rstudio-server:/var/run/rstudio-server -B /data:/home {{ container_name }}_{{ container_version }}.sif rserver --www-port 8787 --www-address 0.0.0.0 --auth-none=0 --auth-pam-helper-path=pam-helper &
+    shell: PASSWORD='{{ rstudio_password }}' singularity exec -B /tmp/rstudio-server:/var/lib/rstudio-server -B /tmp/rstudio-server:/var/run/rstudio-server -B /data:/home {{ container_name }}_{{ container_version }}.sif rserver --www-port 8787 --www-address 0.0.0.0 --auth-none=0 --auth-pam-helper-path=pam-helper &
   - name: Print RStudio server instructions
     debug: 
-      var: result_rstudio.stdout_lines    
+      var: result_rstudio.stdout_lines  
