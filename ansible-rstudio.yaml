@@ -32,18 +32,25 @@
       echo "RUN R -e 'library(BiocManager)'
       RUN R -e 'BiocManager::install({{ BiocManager_tools }})'" >> Dockerfile-{{ container_name }}
   - name: Building the container
-    command: sudo docker build -f Dockerfile-{{ container_name }} -t {{ container_name }}:{{ container_version }} .
+    command: docker build -f Dockerfile-{{ container_name }} -t {{ container_name }}:{{ container_version }} .
+    become: yes
   - name: Pulling the container as a Singularity image
-    command: sudo singularity pull docker-daemon:{{ container_name }}:{{ container_version }}
+    command: singularity pull docker-daemon:{{ container_name }}:{{ container_version }}
+    become: yes
     args:
       creates: "{{ container_name }}_{{ container_version }}.sif"
   - name: Running the container as an interactive RStudio session
     script: run_rstudio.sh '{{ ssh_key_path }}' '{{ rstudio_password}}'
     register: result_rstudio
   - name: Create a data folder
-    command: sudo mkdir /data && sudo chown ubuntu:ubuntu /data
+    command: mkdir /data
+    become: yes
     args:
       creates: /data
+  - name: Change ownership of data folder
+    command: chown ubuntu:ubuntu /data
+    become: yes
+    warn: false
   - name: Create RStudio server folder
     command: mkdir -p /tmp/rstudio-server
     args:  
