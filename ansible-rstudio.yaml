@@ -50,7 +50,6 @@
   - name: Change ownership of data folder
     command: chown ubuntu:ubuntu /data
     become: yes
-    warn: false
   - name: Create RStudio server folder
     command: mkdir -p /tmp/rstudio-server
     args:  
