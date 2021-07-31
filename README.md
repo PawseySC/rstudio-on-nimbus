@@ -1,11 +1,11 @@
 # Automated deployment of RStudio
 
 ## Summary
-This repository covers the scripts for running RStudio with Ansible on cloud services. The RStudio Dockerfile is based off Rocker/Tidyverse - which is handy for bioinformatics users, with changes made to the read permissions of RStudio server paths to enable running of RStudio interactively. The container is first built with Docker, then pulled as a Singularity image. This allows the image to be used on HPC if required. 
+This repository covers the scripts for running RStudio with Ansible on cloud services. The RStudio Dockerfile is based off Rocker/Tidyverse - which is handy for bioinformatics users, with changes made to the read permissions of RStudio server paths to enable running of RStudio interactively. The container is first built with Docker, then pulled from the Docker daemon to build a Singularity container. This allows the container to be used on HPC if required. 
 
 ## Before you start
 
-This deployment uses Docker and Singularity to write and build an RStudio container.
+This deployment uses Singularity to build an RStudio Singularity container.
 
 It is recommended that users change their Singularity cache directory to a storage volume, as the default is in the `/home` directory, i.e. `/home/ubuntu/.singularity/cache`, which can run out of space quickly. To change it, simply create a new directory and update the `$SINGULARITY_CACHEDIR` variable to it. It is also recommended that you have your storage volume [mounted to a directory named `/data`](https://support.pawsey.org.au/documentation/display/US/Attach+a+Storage+Volume).
     
@@ -42,11 +42,18 @@ Ansible needs to be installed on the machine.
 
 Once you have run the above, you will have followed instructions to create a port forwarding on your computer, then open a web browser to localhost:8787 to login to RStudio.
 
-On the RStudio console, check that your library path is correct, i.e. you should see this:
+On the RStudio console, check that your library path is correct as below:
 
+    # If the R version = 3.6.3, you should see:
     > .libPaths()
     [1] "/usr/local/lib/R/site-library" "/usr/local/lib/R/library"     
     [3] "/home/rstudio/library"
+
+    # If the R version >= 4.0.0, you should see:
+    > .libPaths()
+    [1] "/home/rstudio/R/x86_64-pc-linux-gnu-library/4.1"
+    [2] "/usr/local/lib/R/site-library"                  
+    [3] "/usr/local/lib/R/library" 
 
 From here, you can load the libraries you require, add data to `/home/rstudio`, and run the analyses you require. Note that `/home/rstudio` on RStudio corresponds to `/data/rstudio` on your Nimbus instance.
 
