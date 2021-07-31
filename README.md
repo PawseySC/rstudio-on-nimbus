@@ -53,7 +53,7 @@ On the RStudio console, check that your library path is correct, i.e. you should
     [1] "/usr/local/lib/R/site-library" "/usr/local/lib/R/library"     
     [3] "/home/rstudio/library"
 
-From here, you can load the libraries you require, add data to `/home/rstudio/library`, and run the analyses you require. Note that `/home/rstudio/library` on RStudio corresponds to `/data/rstudio/library` on your Nimbus instance.
+From here, you can load the libraries you require, add data to `/home/rstudio`, and run the analyses you require. Note that `/home/rstudio` on RStudio corresponds to `/data/rstudio` on your Nimbus instance.
 
 ## Notes
 
