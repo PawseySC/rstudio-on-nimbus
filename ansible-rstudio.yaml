@@ -24,15 +24,26 @@
     prompt: "Enter the path to your ssh private key for this Nimbus instance on your local computer, e.g. ~/.ssh/id_rsa.key"
     private: no
   tasks:
-  - name: Writing the Dockerfile
+  - name: Print R version number
+    shell: echo {{ R_version }}
+    register: R_version_number
+  - name: Adding /home/rstudio/library directory as install path if R_version is 3.6.3
     shell: |
-      cp Dockerfile Dockerfile-{{ container_name }}
-      sed -i "s|tidyverse:4.0.3|tidyverse:{{ R_version }}|g" Dockerfile-{{ container_name }}
-      sed -i "s|caTools|caTools {{ R_tools }}|g" Dockerfile-{{ container_name }}
-      echo "RUN R -e 'library(BiocManager)'
-      RUN R -e 'BiocManager::install({{ BiocManager_tools }})'" >> Dockerfile-{{ container_name }}
+      cp Dockerfile Dockerfile-{{ container_name }}_{{ container_version }}
+      echo "RUN mkdir /home/rstudio/library \
+      && echo 'myPaths <- .libPaths(); myPaths <- c(myPaths, \"/home/rstudio/library\"); .libPaths(myPaths)' >> /usr/local/lib/R/library/base/R/Rprofile" >> Dockerfile-{{ container_name }}_{{ container_version }}
+    become: yes
+    when: R_version_number.stdout == "3.6.3"  
+  - name: Completing the Dockerfile
+    shell: |
+      sed -i "s|tidyverse:4.0.3|tidyverse:{{ R_version }}|g" Dockerfile-{{ container_name }}_{{ container_version }}
+      sed -i "s|caTools|caTools {{ R_tools }}|g" Dockerfile-{{ container_name }}_{{ container_version }}
+      echo "RUN R -e 'library(BiocManager)' \
+      && R -e 'BiocManager::install({{ BiocManager_tools }})'" >> Dockerfile-{{ container_name }}_{{ container_version }}
+    args:
+      warn: false
   - name: Building the container
-    command: docker build -f Dockerfile-{{ container_name }} -t {{ container_name }}:{{ container_version }} .
+    command: docker build -f Dockerfile-{{ container_name }}_{{ container_version }} -t {{ container_name }}:{{ container_version }} .
     become: yes
   - name: Pulling the container as a Singularity image
     command: singularity pull docker-daemon:{{ container_name }}:{{ container_version }}
@@ -50,10 +61,12 @@
   - name: Change ownership of data folder
     command: chown ubuntu:ubuntu /data
     become: yes
+    args:
+      warn: false
   - name: Create RStudio server folder
     command: mkdir -p /tmp/rstudio-server
     args:  
-      creates: /tmp/rstudio-server
+      creates: /tmp/rstudio-server 
   - name: Run rserver command
     shell: PASSWORD='{{ rstudio_password }}' singularity exec -B /tmp/rstudio-server:/var/lib/rstudio-server -B /tmp/rstudio-server:/var/run/rstudio-server -B /data:/home {{ container_name }}_{{ container_version }}.sif rserver --www-port 8787 --www-address 0.0.0.0 --auth-none=0 --auth-pam-helper-path=pam-helper &
   - name: Print RStudio server instructions

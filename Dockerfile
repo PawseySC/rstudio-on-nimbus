@@ -6,6 +6,5 @@ RUN install2.r --error \
 
 RUN R -e 'install.packages("BiocManager")'
 
-RUN chmod a+w /var/lib/rstudio-server \
-    && chmod a+w /var/lib/rstudio-server/rstudio.sqlite
+RUN chmod a+w /var/lib/rstudio-server
 
