@@ -19,7 +19,7 @@ echo "--------------------------------------------------------------------------
 
         NOTE: To re-run the rserver command, first kill the current process on your instance, then re-run the Ansible playbook.     
                 Kill the process by running:                                                                                        
-                kill \$(ps | grep 'rsession' | awk '{print \$1}') && kill \$(ps | grep 'rserver' | awk '{print \$1}')                   
+                kill \$(ps | grep 'rsession' | awk '{print \$1}'); kill \$(ps | grep 'rserver' | awk '{print \$1}')                   
 
         IMPORTANT: After exiting RStudio, close the 8787 port on your local computer:                                               
                    lsof -ti:8787 | xargs kill -9                                                                                    
