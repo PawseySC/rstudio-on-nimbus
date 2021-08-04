@@ -24,6 +24,9 @@ This Ansible playbook works on Ubuntu 18.04 and Ubuntu 20.04. Other operating sy
 
 Ansible needs to be installed on the machine.
 
+### Supported R versions
+We support only R versions 3.6.3 and above.
+
 ### Install Ansible (if it is not already installed)
 
     sudo apt install --yes software-properties-common
