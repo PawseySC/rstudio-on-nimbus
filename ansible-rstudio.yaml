@@ -3,7 +3,7 @@
   hosts: localhost
   vars_prompt:
   - name: R_version
-    prompt: "Enter the R version you require - ensure it is available as a tag at https://hub.docker.com/r/rocker/tidyverse/tags"
+    prompt: "Enter the R version you require (supported versions are 3.6.3 and >= 4.0.0) - ensure it is available as a tag at https://hub.docker.com/r/rocker/tidyverse/tags"
     private: no  
   - name: R_tools
     prompt: "Enter the R package tool you require as a space-separated list if more than one, e.g. tool1 tool2 tool3. If irrelevant, just press enter"
@@ -12,7 +12,7 @@
     prompt: 'Enter the BiocManager tool you require, in the format (c(\"tool\")), as a comma-separated list if more than one, e.g. (c(\"tool1\",\"tool2\",\"tool3\")). If irrelevant, just press enter'
     private: no
   - name: container_name
-    prompt: "Give the container a name (no capitals)"
+    prompt: "Give the container a name (no capitals) (blank not accepted)"
     private: no
   - name: container_version
     prompt: "Give the container a version number"
