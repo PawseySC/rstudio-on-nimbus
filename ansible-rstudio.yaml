@@ -51,7 +51,7 @@
     command: docker build -f Dockerfile-{{ container_name }}_{{ container_version }} -t {{ container_name }}:{{ container_version }} .
     become: yes
   - name: Building the Singularity container
-    command: singularity pull /home/ubuntu/containers/ docker-daemon:{{ container_name }}:{{ container_version }}
+    command: singularity pull --dir /home/ubuntu/containers/ docker-daemon:{{ container_name }}:{{ container_version }}
     become: yes
     args:
       creates: "/home/ubuntu/containers/{{ container_name }}_{{ container_version }}.sif"
