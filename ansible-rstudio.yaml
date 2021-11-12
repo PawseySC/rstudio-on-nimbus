@@ -51,10 +51,10 @@
     command: docker build -f Dockerfile-{{ container_name }}_{{ container_version }} -t {{ container_name }}:{{ container_version }} .
     become: yes
   - name: Building the Singularity container
-    command: singularity pull docker-daemon:{{ container_name }}:{{ container_version }}
+    command: singularity pull /home/ubuntu/containers/ docker-daemon:{{ container_name }}:{{ container_version }}
     become: yes
     args:
-      creates: "{{ container_name }}_{{ container_version }}.sif"
+      creates: "/home/ubuntu/containers/{{ container_name }}_{{ container_version }}.sif"
   - name: Running the container as an interactive RStudio session
     script: run_rstudio.sh '{{ ssh_key_path }}' '{{ rstudio_password}}'
     register: result_rstudio
@@ -68,12 +68,24 @@
     become: yes
     args:
       warn: false
+  - name: Mount data folder
+    shell: |
+      if grep -qs /dev/vdc /proc/mounts; then
+        true
+      else
+        sudo mkfs.ext4 /dev/vdc
+        sudo rm -rf /data
+        sudo mkdir /data
+        sudo mount /dev/vdc /data
+      fi
+    become: yes
+    ignore_errors: yes
   - name: Create RStudio server folder
     command: mkdir -p /tmp/rstudio-server
     args:  
       creates: /tmp/rstudio-server 
   - name: Run rserver command
-    shell: PASSWORD='{{ rstudio_password }}' singularity exec -B /tmp/rstudio-server:/var/lib/rstudio-server -B /tmp/rstudio-server:/var/run/rstudio-server -B /data:/home {{ container_name }}_{{ container_version }}.sif rserver --www-port 8787 --www-address 0.0.0.0 --auth-none=0 --auth-pam-helper-path=pam-helper &
+    shell: PASSWORD='{{ rstudio_password }}' singularity exec -B /tmp/rstudio-server:/var/lib/rstudio-server -B /tmp/rstudio-server:/var/run/rstudio-server -B /data:/home /home/ubuntu/containers/{{ container_name }}_{{ container_version }}.sif rserver --www-port 8787 --www-address 0.0.0.0 --auth-none=0 --auth-pam-helper-path=pam-helper &
   - name: Print RStudio server instructions
     debug: 
       var: result_rstudio.stdout_lines  
