@@ -35,8 +35,8 @@ We support only R versions 3.6.3 and above.
     
 ### Clone this repo and run the Ansible script
 
-    git clone https://github.com/audreystott/ansible-rstudio.git
-    cd ansible-rstudio
+    git clone https://github.com/PawseySC/rstudio-on-nimbus
+    cd rstudio-on-nimbus
     ansible-playbook ansible-rstudio.yaml -i vars_list
 
     #If you make a mistake answering the prompts, cancel (control+c) and rerun the `ansible-playbook` command.
