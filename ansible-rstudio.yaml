@@ -50,6 +50,10 @@
   - name: Building the Docker image
     command: docker build -f Dockerfile-{{ container_name }}_{{ container_version }} -t {{ container_name }}:{{ container_version }} .
     become: yes
+  - name: Adding containers directory
+    ansible.builtin.file:
+      path: /home/ubuntu/containers
+      state: directory
   - name: Building the Singularity container
     command: singularity pull --dir /home/ubuntu/containers/ docker-daemon:{{ container_name }}:{{ container_version }}
     become: yes
