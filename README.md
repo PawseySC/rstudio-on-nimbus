@@ -60,6 +60,11 @@ On the RStudio console, check that your library path is correct as below:
 
 From here, you can load the libraries you require, add data to `/home/rstudio`, and run the analyses you require. Note that `/home/rstudio` on RStudio corresponds to `/data/rstudio` on your Nimbus instance.
 
+## End RStudio session
+
+If you require to kill any 8787 ports to run it again, use the following command:
+>lsof -ti:8787 | xargs kill -9
+
 ## Notes
 
 It is advisable to clean the Singularity cache from time to time - when image pulls are completed. To clean it, first list and check that you are happy to remove the cache:
