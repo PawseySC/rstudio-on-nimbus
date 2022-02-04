@@ -27,6 +27,9 @@ Ansible needs to be installed on the machine.
 ### Supported R versions
 We support only R versions 3.6.3 and above.
 
+### Default Linux libraries
+Some R packages and Bioconductor packages require specific libraries on the operating system. Container deployments such as this RStudio only include the most basic default Linux libraries. We have included a few extras that users have brought to our attention that is common for some bioconductor packages. If you require other libraries, feel free to edit the Dockerfile to include them.
+
 ### Install Ansible (if it is not already installed)
 
     sudo apt install --yes software-properties-common
