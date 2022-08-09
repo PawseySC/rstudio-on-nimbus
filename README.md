@@ -46,7 +46,7 @@ Some R packages and Bioconductor packages require specific libraries on the oper
 
 ## Ensure RStudio is running as intended
 
-Once you have run the above, you will find the `Run rserver command` task stop at 
+Once you have run the above, you will have followed instructions to login to your RStudio session from a web browser using your instance IP address and the port 8787, e.g. `146.118.XX.XX:8787`
 
     # You should see:
     > .libPaths()
