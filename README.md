@@ -48,7 +48,7 @@ Some R packages and Bioconductor packages require specific libraries on the oper
 
 Once you have run the above, you will have followed instructions to login to your RStudio session from a web browser using your instance IP address and the port 8787, e.g. `146.118.XX.XX:8787`
 
-    # You should see:
+    # You should see (if R=4.1.0):
     > .libPaths()
     [1] "/home/rstudio/R/x86_64-pc-linux-gnu-library/4.1"
     [2] "/usr/local/lib/R/site-library"                  
