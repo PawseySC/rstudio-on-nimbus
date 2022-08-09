@@ -3,7 +3,7 @@
   hosts: localhost
   vars_prompt:
   - name: R_version
-    prompt: "Enter the R version you require (supported versions are 3.6.3 and >= 4.0.0) - ensure it is available as a tag at https://hub.docker.com/r/rocker/tidyverse/tags"
+    prompt: "Enter the R version you require (either 4.1.0 and 4.2.0)"
     private: no  
   - name: R_tools
     prompt: "Enter the R package tool you require as a space-separated list if more than one, e.g. tool1 tool2 tool3. If irrelevant, just press enter"
@@ -20,76 +20,65 @@
   - name: rstudio_password
     prompt: "Give a simple password for your RStudio session, e.g. abc"
     private: no
-  - name: ssh_key_path
-    prompt: "Enter the path to your ssh private key for this Nimbus instance on your local computer, e.g. ~/.ssh/id_rsa.key"
-    private: no
   tasks:
   - name: Print R version number
     shell: echo {{ R_version }}
     register: R_version_number
-  - name: Dockerfile changes for R_version == 3.6.3
+  - name: Mount data folder
     shell: |
-      cp Dockerfile Dockerfile-{{ container_name }}_{{ container_version }}
-      echo "RUN mkdir /home/rstudio/library \
-      && echo 'myPaths <- .libPaths(); myPaths <- c(myPaths, \"/home/rstudio/library\"); .libPaths(myPaths)' >> /usr/local/lib/R/library/base/R/Rprofile" >> Dockerfile-{{ container_name }}_{{ container_version }}
+      DATADIR="/data"
+      DIR="/dev/vdc"
+      DIR2="/dev/sdc"
+      if grep -qs /dev/vdc /proc/mounts; then
+        true
+      else
+        if [[ -d "$DIR" ]]; then
+          true
+        else
+         sudo mkfs.ext4 /dev/vdc
+         sudo mount /dev/vdc /data
+         mkdir /data/containers
+        fi
+      fi
+      if grep -qs /dev/sdc /proc/mounts; then
+        true
+      else
+        if [[ -d "$DIR" ]]; then
+          true
+        else
+         sudo mkfs.ext4 /dev/sdc
+         sudo mount /dev/sdc /data
+         mkdir /data/containers
+        fi
+      fi      
     become: yes
-    when: R_version_number.stdout == "3.6.3"  
-  - name: Dockerfile changes for R_version != 3.6.3
-    shell: |
-      cp Dockerfile Dockerfile-{{ container_name }}_{{ container_version }}
-      echo "RUN sed -i '1488s|true|false|' /usr/lib/rstudio-server/resources/schema/user-prefs-schema.json" >> Dockerfile-{{ container_name }}_{{ container_version }} #to uncheck memory usage showing up
-    when: R_version_number.stdout != "3.6.3" 
+    ignore_errors: yes
   - name: Completing the Dockerfile
     shell: |
-      sed -i "s|tidyverse:4.0.3|tidyverse:{{ R_version }}|g" Dockerfile-{{ container_name }}_{{ container_version }}
+      cp Dockerfile Dockerfile-{{ container_name }}_{{ container_version }}
+      sed -i "s|rstudio:4.1.0|rstudio:{{ R_version }}|g" Dockerfile-{{ container_name }}_{{ container_version }}
       sed -i "s|caTools|caTools {{ R_tools }}|g" Dockerfile-{{ container_name }}_{{ container_version }}
       echo "RUN R -e 'library(BiocManager)' \
       && R -e 'BiocManager::install({{ BiocManager_tools }})'" >> Dockerfile-{{ container_name }}_{{ container_version }}
     args:
       warn: false
+  - name: Adding containers directory
+    ansible.builtin.file:
+      path: /data/containers
+      state: directory
   - name: Building the Docker image
     command: docker build -f Dockerfile-{{ container_name }}_{{ container_version }} -t {{ container_name }}:{{ container_version }} .
     become: yes
-  - name: Adding containers directory
-    ansible.builtin.file:
-      path: /home/ubuntu/containers
-      state: directory
   - name: Building the Singularity container
-    command: singularity pull --dir /home/ubuntu/containers/ docker-daemon:{{ container_name }}:{{ container_version }}
+    command: singularity pull --dir /data/containers/ docker-daemon:{{ container_name }}:{{ container_version }}
     become: yes
     args:
-      creates: "/home/ubuntu/containers/{{ container_name }}_{{ container_version }}.sif"
-  - name: Running the container as an interactive RStudio session
-    script: run_rstudio.sh '{{ ssh_key_path }}' '{{ rstudio_password}}'
-    register: result_rstudio
-  - name: Create a data folder
-    command: mkdir /data
-    become: yes
-    args:
-      creates: /data
-  - name: Change ownership of data folder
-    command: chown ubuntu:ubuntu /data
-    become: yes
-    args:
-      warn: false
-  - name: Mount data folder
-    shell: |
-      if grep -qs /dev/vdc /proc/mounts; then
-        true
-      else
-        sudo mkfs.ext4 /dev/vdc
-        sudo rm -rf /data
-        sudo mkdir /data
-        sudo mount /dev/vdc /data
-      fi
-    become: yes
-    ignore_errors: yes
+      creates: "/data/containers/{{ container_name }}_{{ container_version }}.sif"
   - name: Create RStudio server folder
     command: mkdir -p /tmp/rstudio-server
     args:  
       creates: /tmp/rstudio-server 
   - name: Run rserver command
-    shell: PASSWORD='{{ rstudio_password }}' singularity exec -B /tmp/rstudio-server:/var/lib/rstudio-server -B /tmp/rstudio-server:/var/run/rstudio-server -B /data:/home /home/ubuntu/containers/{{ container_name }}_{{ container_version }}.sif rserver --www-port 8787 --www-address 0.0.0.0 --auth-none=0 --auth-pam-helper-path=pam-helper &
-  - name: Print RStudio server instructions
-    debug: 
-      var: result_rstudio.stdout_lines  
+    shell: PASSWORD='{{ rstudio_password }}' singularity exec -B /tmp/rstudio-server:/var/lib/rstudio-server -B /tmp/rstudio-server:/var/run/rstudio-server -B /data:/home /data/containers/{{ container_name }}_{{ container_version }}.sif rserver --auth-none=0 --auth-pam-helper-path=pam-helper --server-user ubuntu &
+  - name: Print message
+    command: echo "Go to a web browser to login to the RStudio session using your Nimbus instance IP address, e.g. 146.118.XX.XX:8787. (If you have not opened port 8787, go to https://support.pawsey.org.au/documentation/pages/viewpage.action?pageId=59476382#RunRStudioInteractively-1.Openport8787onNimbusdashboard)."

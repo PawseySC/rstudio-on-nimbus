@@ -22,10 +22,10 @@ This is an interactive deployment, such that when the Ansible playbook script is
 ### Prerequisite
 This Ansible playbook works on Ubuntu 18.04 and Ubuntu 20.04. Other operating systems and versions will require testing. Raise a ticket if you face issues running this with other operating systems.
 
-Ansible needs to be installed on the machine.
+Ansible needs to be installed on the machine (instructions provided below).
 
 ### Supported R versions
-We support only R versions 3.6.3 and above.
+We support only R versions 4.1.0 and 4.2.0.
 
 ### Default Linux libraries
 Some R packages and Bioconductor packages require specific libraries on the operating system. Container deployments such as this RStudio only include the most basic default Linux libraries. We have included a few extras that users have brought to our attention that is common for some bioconductor packages. If you require other libraries, feel free to edit the Dockerfile to include them.
@@ -40,22 +40,15 @@ Some R packages and Bioconductor packages require specific libraries on the oper
 
     git clone https://github.com/PawseySC/rstudio-on-nimbus
     cd rstudio-on-nimbus
-    ansible-playbook ansible-rstudio.yaml -i vars_list
+    ansible-playbook ansible-rstudio.yaml
 
     #If you make a mistake answering the prompts, cancel (control+c) and rerun the `ansible-playbook` command.
 
 ## Ensure RStudio is running as intended
 
-Once you have run the above, you will have followed instructions to create a port forwarding on your computer, then open a web browser to localhost:8787 to login to RStudio.
+Once you have run the above, you will have followed instructions to login to your RStudio session from a web browser using your instance IP address and the port 8787, e.g. `146.118.XX.XX:8787`
 
-On the RStudio console, check that your library path is correct as below:
-
-    # If the R version = 3.6.3, you should see:
-    > .libPaths()
-    [1] "/usr/local/lib/R/site-library" "/usr/local/lib/R/library"     
-    [3] "/home/rstudio/library"
-
-    # If the R version >= 4.0.0, you should see:
+    # You should see (if R=4.1.0):
     > .libPaths()
     [1] "/home/rstudio/R/x86_64-pc-linux-gnu-library/4.1"
     [2] "/usr/local/lib/R/site-library"                  
@@ -65,16 +58,17 @@ From here, you can load the libraries you require, add data to `/home/rstudio`, 
 
 ## End RStudio session
 
-If you require to kill any 8787 ports to run it again, use the following command:
->lsof -ti:8787 | xargs kill -9
+To end the RStudio session from your instance:
+
+    lsof -ti:8787 | xargs kill -9
 
 ## Notes
 
 It is advisable to clean the Singularity cache from time to time - when image pulls are completed. To clean it, first list and check that you are happy to remove the cache:
 
-    singularity cache list
+    singularity cache list -v
     singularity cache clean
 
     ** Use sudo if you did not change the $SINGULARITY_CACHEDIR variable **
-    sudo singularity cache list
+    sudo singularity cache list -v
     sudo singularity cache clean
