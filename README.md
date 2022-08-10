@@ -25,7 +25,7 @@ This Ansible playbook works on Ubuntu 18.04 and Ubuntu 20.04. Other operating sy
 Ansible needs to be installed on the machine (instructions provided below).
 
 ### Supported R versions
-We support only R versions 4.1.0 and 4.2.0.
+We have tested and can currently support only R versions 4.1.0, although other versions can still be trialed.
 
 ### Default Linux libraries
 Some R packages and Bioconductor packages require specific libraries on the operating system. Container deployments such as this RStudio only include the most basic default Linux libraries. We have included a few extras that users have brought to our attention that is common for some bioconductor packages. If you require other libraries, feel free to edit the Dockerfile to include them.
