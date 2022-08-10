@@ -3,7 +3,7 @@
   hosts: localhost
   vars_prompt:
   - name: R_version
-    prompt: "Enter the R version you require (either 4.1.0 and 4.2.0)"
+    prompt: "Enter the R version you require (currently supported version = 4.1.0)"
     private: no  
   - name: R_tools
     prompt: "Enter the R package tool you require as a space-separated list if more than one, e.g. tool1 tool2 tool3. If irrelevant, just press enter"
@@ -71,7 +71,6 @@
     become: yes
   - name: Building the Singularity container
     command: singularity pull --dir /data/containers/ docker-daemon:{{ container_name }}:{{ container_version }}
-    become: yes
     args:
       creates: "/data/containers/{{ container_name }}_{{ container_version }}.sif"
   - name: Create RStudio server folder
