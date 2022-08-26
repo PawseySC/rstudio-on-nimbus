@@ -7,12 +7,13 @@ This repository covers the scripts for running RStudio with Ansible on cloud ser
 
 This deployment uses Singularity to build an RStudio Singularity container.
 
-It is recommended that users change their Singularity cache directory to a storage volume, as the default is in the `/home` directory, i.e. `/home/ubuntu/.singularity/cache`, which can run out of space quickly. To change it, simply create a new directory and update the `$SINGULARITY_CACHEDIR` variable to it. It is also recommended that you have your storage volume [mounted to a directory named `/data`](https://support.pawsey.org.au/documentation/display/US/Attach+a+Storage+Volume).
+1. It is recommended that users change their Singularity cache directory to a storage volume, as the default is in the `/home` directory, i.e. `/home/ubuntu/.singularity/cache`, which can run out of space quickly. To change it, simply create a new directory and update the `$SINGULARITY_CACHEDIR` variable to it. It is also recommended that you have your storage volume [mounted to a directory named `/data`](https://support.pawsey.org.au/documentation/display/US/Attach+a+Storage+Volume).
     
     # Skip this step if you do not have a storage volume.
     mkdir /data/singularity_cache
     SINGULARITY_CACHEDIR=/data/singularity_cache
 
+2. Ensure that you have port 8787 open for your instance, you can do so on the Nimbus dashboard following these [instructions](https://support.pawsey.org.au/documentation/pages/viewpage.action?pageId=92832676#NimbusforBioinformatics-RStudio).
 
 ## Quick start
 This is an interactive deployment, such that when the Ansible playbook script is run, the user will be prompted to enter any R packages or Bioconductor packages that is required. While libraries can be installed post-container build, it is encouraged to build them into the container for software dependency efficiencies.
