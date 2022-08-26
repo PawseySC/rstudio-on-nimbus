@@ -46,9 +46,9 @@ Some R packages and Bioconductor packages require specific libraries on the oper
 
     #If you make a mistake answering the prompts, cancel (control+c) and rerun the `ansible-playbook` command.
 
-## Ensure RStudio is running as intended
+## Open a web browser and access your RStudio session
 
-Once you have run the above, you will have followed instructions to login to your RStudio session from a web browser using your instance IP address and the port 8787, e.g. `146.118.XX.XX:8787`
+Once you have run the above, you can login to your RStudio session from a web browser using your instance IP address and the port 8787, e.g. `146.118.XX.XX:8787`
 
     # You should see (if R=4.1.0):
     > .libPaths()
